@@ -2,6 +2,7 @@ import ast
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+from tkinter import scrolledtext
 import solve
 
 def is_valid_entry(check):
@@ -90,6 +91,18 @@ coord_5.grid(column=1, row=4)
 
 submit_button = ttk.Button(tab_1, text="Submit", command=save_to_file)
 submit_button.grid(column=1, row=5)
+
+scroll_bar = scrolledtext.ScrolledText(tab_1,  width=30, height=15, wrap=tk.WORD, font=("Arial", 12))
+scroll_bar.grid(column=0, row=6, columnspan=2)
+info = ""
+info += "Enter coordinates in the following format (x, y)\n"
+info += "Coordinates must be between 0<=x<50 and 0<=y<50\n"
+info += "Draw barriers by holding down left click\n"
+info += "Press c to clear barriers\n"
+info += "Press s to solve\n"
+
+scroll_bar.insert(tk.INSERT, info)
+scroll_bar.config(state=tk.DISABLED)
 
 # tab 2 (load from recent)
 recent_button_data = []
