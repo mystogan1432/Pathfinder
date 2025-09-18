@@ -57,8 +57,7 @@ def find_path_order(points):
     return order
 
 def bfs(start, end, barriers):
-    directions = [(-1, 0), (1, 0), (0, -1), (0, 1),
-                  (-1, -1), (-1, 1), (1, -1), (1, 1)]
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]
     grid_size = 50
     queue = deque()
     queue.append(start)
