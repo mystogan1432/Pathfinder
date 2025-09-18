@@ -1,6 +1,7 @@
 import math
 import sys
 import pygame
+from collections import deque
 
 colours = [(0, 0, 0), (255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 0, 255), (255, 255, 0), (255, 255, 255)]
 height = 700
@@ -55,29 +56,49 @@ def find_path_order(points):
         order.append(points.pop(temp))
     return order
 
+def bfs(start, end, barriers):
+    directions = [(-1, -1), (-1, 1), (1, -1), (1, 1), (-1, 0), (1, 0), (0, -1), (0, 1)]
+    grid_size = 50
+    queue = deque()
+    queue.append(start)
+    came_from = {}
+    visited = set()
+    visited.add(start)
+
+    while queue:
+        current = queue.popleft()
+        if current == end:
+            break
+
+        for adj_x, adj_y in directions:
+            neighbor = (current[0] + adj_x, current[1] + adj_y)
+            if (0 <= neighbor[0] < grid_size and 0 <= neighbor[1] < grid_size and
+                    neighbor not in barriers and neighbor not in visited):
+                queue.append(neighbor)
+                visited.add(neighbor)
+                came_from[neighbor] = current
+
+    # Reconstruct path
+    if end not in came_from:
+        return []  # No path found
+    curr = end
+    local_path = []
+    while curr != start:
+        local_path.append(curr)
+        curr = came_from[curr]
+    local_path.reverse()
+    return local_path
+
 def find_path(points, barriers):
     path = []
-    print(points)
     for i in range(1, len(points)):
-        x, y = points[i - 1]
-        target_x, target_y = points[i]
-
-        while (x, y) != (target_x, target_y):
-            possible_x = x + (1 if target_x > x else -1 if target_x < x else 0)
-            possible_y = y + (1 if target_y > y else -1 if target_y < y else 0)
-            if (possible_x, possible_y) in barriers:
-                if (possible_x, y) in barriers:
-                    x = possible_x
-                elif (y, possible_y) in barriers:
-                    y = possible_y
-                else:
-                    break
-            else:
-                x = possible_x
-                y = possible_y
-            path.append((x, y))
-
+        found_path = bfs(points[i-1], points[i], barriers)
+        if found_path:
+            path.extend(found_path)
+        else:
+            return "invalid path"
     return path
+
 
 def solve_app(points):
     window = pygame.display.set_mode((height, width))
@@ -112,9 +133,12 @@ def solve_app(points):
                     print(f"points: {points}")
                     point_order = find_path_order(points)
                     path = find_path(point_order, barriers)
-                    print(path)
-                    for fin in path:
-                        grid[int(fin[0])][int(fin[1])] = 4
+                    if path == "invalid path":
+                        print("path not valid")
+                    else:
+                        print(path)
+                        for fin in path:
+                            grid[int(fin[0])][int(fin[1])] = 4
 
 
         pygame.display.update()
